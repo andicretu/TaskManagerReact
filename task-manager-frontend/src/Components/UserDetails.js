@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
+import { Container, Typography, Box, Button, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import TaskDetails from './TaskDetails';
-import TaskList from './TaskList'; // Import TaskList component
 
 const UserDetails = () => {
   const [user, setUser] = useState(null);
@@ -13,7 +12,6 @@ const UserDetails = () => {
   const [newTask, setNewTask] = useState({ title: '', description: '' });
   const navigate = useNavigate();
 
-  // Fetch tasks for the authenticated user
   const handleTasksFetch = () => {
     const token = localStorage.getItem('authToken');
 
@@ -143,9 +141,41 @@ const UserDetails = () => {
       {/* Two-column layout: Task List and Task Details */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
         
-        {/* Task List Section - Use TaskList component */}
+        {/* Task List Section */}
         <Box sx={{ flex: 1, p: 3, boxShadow: 3, borderRadius: 2 }}>
-          <TaskList tasks={tasks} onTaskClick={handleTaskClick} onAddTask={handleOpenAddTaskDialog} />
+          <Typography variant="h5" align="center" gutterBottom>
+            Tasks
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mb: 2 }}
+            onClick={handleOpenAddTaskDialog}
+          >
+            Add Task
+          </Button>
+          {tasks.length > 0 ? (
+            <List>
+              {tasks.map((task) => (
+                <ListItem key={task.id} button onClick={() => handleTaskClick(task)}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <ListItemText
+                      primary={task.title}
+                      secondary={task.description}
+                    />
+                    <Typography variant="body2" color="textSecondary" sx={{ alignSelf: 'center' }}>
+                      {task.status || 'Not Started'}
+                    </Typography>
+                  </Box>
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography variant="body1" align="center">
+              No tasks available.
+            </Typography>
+          )}
         </Box>
 
         {/* Task Details Section */}
@@ -201,7 +231,3 @@ const UserDetails = () => {
 };
 
 export default UserDetails;
-
-
-
-
