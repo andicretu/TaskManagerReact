@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
 
@@ -11,6 +11,15 @@ const TaskDetails = ({ task, onTaskUpdated, onTaskDeleted, onClose }) => {
   });
 
   const token = localStorage.getItem('authToken');
+
+  useEffect(() => {
+    setIsEditing(false);
+    setEditedTask({
+      title: task.title,
+      description: task.description,
+      status: task.status
+    });
+  }, [task]);
 
   const handleSaveClick = () => {
     axios.put(`http://localhost:8080/api/tasks/${task.id}`, {
