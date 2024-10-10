@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Typography, Box, Button, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,14 @@ const UserDetails = () => {
   const [newTask, setNewTask] = useState({ title: '', description: '' });
   const navigate = useNavigate();
 
-  const handleTasksFetch = () => {
+  // Function to sort tasks by status: Not Started -> In Progress -> Done
+  const sortTasks = (tasks) => {
+    const statusOrder = { 'Not Started': 1, 'In Progress': 2, 'Done': 3 };
+    return tasks.sort((a, b) => (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0));
+  };
+
+  // Function to fetch tasks for the authenticated user
+  const handleTasksFetch = useCallback(() => {
     const token = localStorage.getItem('authToken');
 
     axios.get(`http://localhost:8080/api/tasks`, {
@@ -21,14 +28,15 @@ const UserDetails = () => {
       }
     })
     .then(response => {
-      setTasks(response.data);
-      console.log('Tasks fetched successfully:', response.data);
+      const sortedTasks = sortTasks(response.data); // Sort tasks after fetching
+      setTasks(sortedTasks);
+      console.log('Tasks fetched and sorted successfully:', sortedTasks);
     })
     .catch(error => {
       console.error('Error fetching tasks:', error);
       alert('Failed to fetch tasks.');
     });
-  };
+  }, []);
 
   useEffect(() => {
     const userEmail = localStorage.getItem('userEmail');
@@ -43,7 +51,7 @@ const UserDetails = () => {
         .then(response => {
           setUser(response.data);
           console.log('User details fetched successfully:', response.data);
-          handleTasksFetch();
+          handleTasksFetch(); // Fetch tasks once user details are loaded
         })
         .catch(error => {
           console.error('Error fetching user details:', error);
@@ -53,19 +61,21 @@ const UserDetails = () => {
       alert('No user email found in localStorage. Please log in.');
       navigate('/login');
     }
-  }, [navigate]);
+  }, [navigate, handleTasksFetch]);
 
   const handleTaskClick = (task) => {
     setSelectedTask(task); // Set the clicked task to display its details
   };
 
   const handleTaskUpdated = (updatedTask) => {
-    setTasks(tasks.map(task => task.id === updatedTask.id ? updatedTask : task)); // Update the task in the list
+    const updatedTasks = tasks.map(task => task.id === updatedTask.id ? updatedTask : task);
+    setTasks(sortTasks(updatedTasks)); // Sort tasks after update
     setSelectedTask(updatedTask); // Update the selected task with new data
   };
 
   const handleTaskDeleted = (taskId) => {
-    setTasks(tasks.filter(task => task.id !== taskId)); // Remove task from the list
+    const remainingTasks = tasks.filter(task => task.id !== taskId);
+    setTasks(sortTasks(remainingTasks)); // Sort tasks after deletion
     setSelectedTask(null); // Clear selected task
   };
 
@@ -93,7 +103,8 @@ const UserDetails = () => {
       }
     })
     .then(response => {
-      setTasks([...tasks, response.data]);
+      const updatedTasks = [...tasks, response.data];
+      setTasks(sortTasks(updatedTasks)); // Sort tasks after addition
       handleCloseAddTaskDialog();
     })
     .catch(error => {
@@ -231,3 +242,4 @@ const UserDetails = () => {
 };
 
 export default UserDetails;
+
