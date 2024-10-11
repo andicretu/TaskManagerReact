@@ -64,6 +64,7 @@ const UserDetails = () => {
   }, [navigate, handleTasksFetch]);
 
   const handleTaskClick = (task) => {
+    console.log(task.status);
     setSelectedTask(task); // Set the clicked task to display its details
   };
 
@@ -130,7 +131,7 @@ const UserDetails = () => {
       {/* User Details Section as a row above the two-column layout */}
       <Box sx={{ p: 3, boxShadow: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" align="center" gutterBottom>
-          User Details
+          Your Details
         </Typography>
         <Typography variant="body1">
           <strong>Name:</strong> {user.name}
@@ -175,7 +176,16 @@ const UserDetails = () => {
                       primary={task.title}
                       secondary={task.description}
                     />
-                    <Typography variant="body2" color="textSecondary" sx={{ alignSelf: 'center' }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        alignSelf: 'center', 
+                        color:       
+                        task.status === 'Not Started' ? 'red' : 
+                        task.status === 'In Progress' ? 'orange' : 
+                        'green'
+                      }}
+                    >
                       {task.status || 'Not Started'}
                     </Typography>
                   </Box>

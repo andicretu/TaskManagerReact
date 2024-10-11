@@ -18,14 +18,31 @@ const TaskList = ({ tasks, onTaskClick, onAddTask }) => {
       </Button>
       {tasks.length > 0 ? (
         <List>
-          {tasks.map((task) => (
-            <ListItem key={task.id} button onClick={() => onTaskClick(task)}>
-              <ListItemText
-                primary={task.title}
-                secondary={task.description}
-              />
-            </ListItem>
-          ))}
+          {tasks.map((task) => {
+            console.log(task.status); // Check what the status is
+            return (
+                <ListItem key={task.id} button onClick={() => onTaskClick(task)}>
+                    <ListItemText
+                        primary={task.title}
+                        secondary={task.description}
+                    />
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            alignSelf: 'center',
+                            color:
+                                task.status === 'Not Started'
+                                ? 'red'
+                                : task.status === 'In Progress'
+                                ? 'orange'
+                                : 'green',
+                        }}
+                    >
+                        {task.status || 'Not Started'}
+                    </Typography>
+                </ListItem>
+            );
+        })}
         </List>
       ) : (
         <Typography variant="body1" align="center">
