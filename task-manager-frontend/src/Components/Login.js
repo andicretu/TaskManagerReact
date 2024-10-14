@@ -21,16 +21,17 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios.post('http://localhost:8080/api/users/login', credentials)
-      .then(response => {
-        console.log('Login successful:', response.data);
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('userEmail', credentials.email);
-        navigate('/user-details');
-      })
-      .catch(error => {
-        console.error('Login error:', error);
-        alert('Login failed!');
-      });
+    .then(response => {
+      const jwtToken = response.data.token;  // Ensure this is the full JWT token
+      console.log('Login successful:', jwtToken);
+      localStorage.setItem('authToken', jwtToken);  // Store the full JWT token
+      localStorage.setItem('userEmail', credentials.email);
+      navigate('/user-details');
+    })
+    .catch(error => {
+      console.error('Login error:', error);
+      alert('Login failed!');
+    });
   };
 
   return (

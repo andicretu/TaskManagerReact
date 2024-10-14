@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const RegisterUser = () => {
   const [user, setUser] = useState({
@@ -8,6 +9,8 @@ const RegisterUser = () => {
     password: '',
     name: ''
   });
+
+  const navigate = useNavigate(); // Initialize the useNavigate hook
 
   const handleChange = (e) => {
     setUser({
@@ -22,6 +25,7 @@ const RegisterUser = () => {
       .then(response => {
         console.log(response.data);
         alert('User registered successfully!');
+        navigate('/login'); // Redirect to the login page
       })
       .catch(error => {
         console.error(error);
@@ -84,3 +88,4 @@ const RegisterUser = () => {
 };
 
 export default RegisterUser;
+
