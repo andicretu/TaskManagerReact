@@ -11,14 +11,16 @@ const UserDetails = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [openAddTaskDialog, setOpenAddTaskDialog] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', description: '' });
+  const [currentPage, setCurrentPage] = useState(0);  // New state for current page
+  const [totalPages, setTotalPages] = useState(0);  // Total number of pages
   const navigate = useNavigate();
 
   const sortTasks = (tasks) => {
-    const statusOrder = { 'Not Started': 1, 'In Progress': 2, 'Done': 3 };
+    const statusOrder = { 'NOT_STARTED': 1, 'IN_PROGRESS': 2, 'DONE': 3 };
     return tasks.sort((a, b) => (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0));
   };
 
-  const handleTasksFetch = useCallback(() => {
+  const handleTasksFetch = useCallback((page = 0, size = 5) => {
     const token = localStorage.getItem('authToken');
     if (!token) {
       alert('Authentication token is missing. Please log in.');
@@ -28,12 +30,19 @@ const UserDetails = () => {
 
     axios.get(`http://localhost:8080/api/tasks`, {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+      },
+      params: {
+        page,  // Current page number
+        size,  // Number of tasks per page
       }
     })
     .then(response => {
-      const sortedTasks = sortTasks(response.data);
-      setTasks(sortedTasks);
+      const tasks = response.data.content; // Get tasks for the current page
+      const sortedTasks = sortTasks(tasks); // Sort tasks
+      setTasks(sortedTasks);               // Set the sorted tasks for the current page
+      setTotalPages(response.data.totalPages); // Store total pages from response
+      console.log('Tasks fetched and sorted successfully:', sortedTasks);
     })
     .catch(error => {
       console.error('Error fetching tasks:', error.response ? error.response.data : error.message);
@@ -53,7 +62,7 @@ const UserDetails = () => {
       })
         .then(response => {
           setUser(response.data);
-          handleTasksFetch();
+          handleTasksFetch(currentPage);  // Fetch tasks for the current page
         })
         .catch(error => {
           console.error('Error fetching user details:', error);
@@ -63,7 +72,7 @@ const UserDetails = () => {
       alert('No user email found in localStorage. Please log in.');
       navigate('/login');
     }
-  }, [navigate, handleTasksFetch]);
+  }, [navigate, handleTasksFetch, currentPage]);
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
@@ -115,6 +124,18 @@ const UserDetails = () => {
     });
   };
 
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(prevPage => prevPage - 1);
+    }
+  };
+
   if (!user) {
     return (
       <Container maxWidth="md">
@@ -156,6 +177,11 @@ const UserDetails = () => {
         {/* Task List Section */}
         <Box sx={{ flex: 1, p: 3, boxShadow: 3, borderRadius: 2 }}>
           <TaskList tasks={tasks} onTaskClick={handleTaskClick} onAddTask={handleOpenAddTaskDialog} />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+            <Button onClick={handlePreviousPage} disabled={currentPage === 0}>Previous</Button>
+            <Typography>Page {currentPage + 1} of {totalPages}</Typography>
+            <Button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>Next</Button>
+          </Box>
         </Box>
 
         {/* Task Details Section */}
@@ -211,5 +237,3 @@ const UserDetails = () => {
 };
 
 export default UserDetails;
-
-

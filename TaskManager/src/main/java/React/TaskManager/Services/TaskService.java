@@ -17,6 +17,6 @@ public class TaskService {
 
     public Page<TaskModel> getTasksByUser(UserModel user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return taskRepository.findAllByUserModel(user, pageable);
+        return taskRepository.findByUserModel(user, pageable);
     }
 }

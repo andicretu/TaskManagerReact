@@ -3,14 +3,17 @@ package React.TaskManager.Controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import React.TaskManager.Models.TaskModel;
 import React.TaskManager.Repositories.TaskRepository;
 import React.TaskManager.Models.UserModel;
 import React.TaskManager.Repositories.UserRepository;
 import React.TaskManager.Configurations.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -28,7 +31,11 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskModel>> getTasksForUser(HttpServletRequest request) {
+    public ResponseEntity<Page<TaskModel>> getTasksForUser(
+        @RequestParam int page,
+        @RequestParam int size,
+        HttpServletRequest request) {
+
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         String userEmail = jwtUtil.extractEmail(token);
         UserModel user = userRepository.findByEmail(userEmail);
@@ -37,7 +44,8 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     
-        List<TaskModel> tasks = taskRepository.findAllByUserModel(user);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<TaskModel> tasks = taskRepository.findByUserModel(user, pageable);
         return ResponseEntity.ok(tasks);
     }
 
