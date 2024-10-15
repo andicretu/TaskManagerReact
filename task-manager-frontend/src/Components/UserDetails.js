@@ -21,7 +21,7 @@ const UserDetails = () => {
   // Function to fetch tasks for the authenticated user
   const handleTasksFetch = useCallback(() => {
     const token = localStorage.getItem('authToken');
-
+    console.log('authToken', "handletask");
     if (!token) {
       alert('Authentication token is missing. Please log in.');
       navigate('/login');  // Redirect to login
@@ -39,7 +39,7 @@ const UserDetails = () => {
       console.log('Tasks fetched and sorted successfully:', sortedTasks);
     })
     .catch(error => {
-      console.error('Error fetching tasks:', error);
+      console.error('Error fetching tasks:', error.response ? error.response.data : error.message);
       alert('Failed to fetch tasks.');
     });
   }, [navigate]);
@@ -49,7 +49,6 @@ const UserDetails = () => {
     const token = localStorage.getItem('authToken'); 
 
     if (userEmail) {
-      console.log(localStorage.getItem('authToken'));
       axios.get(`http://localhost:8080/api/users/${userEmail}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -59,7 +58,7 @@ const UserDetails = () => {
           setUser(response.data);
           console.log('User details fetched successfully:', response.data);
           handleTasksFetch(); // Fetch tasks once user details are loaded
-          console.log(localStorage.getItem('email'));
+          console.log(localStorage.getItem('userEmail'));
         })
         .catch(error => {
           console.error('Error fetching user details:', error);

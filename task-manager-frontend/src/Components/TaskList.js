@@ -19,7 +19,7 @@ const TaskList = ({ tasks, onTaskClick, onAddTask }) => {
       {tasks.length > 0 ? (
         <List>
           {tasks.map((task) => {
-            console.log(task.status); // Check what the status is
+            console.log(task.status); 
             return (
                 <ListItem key={task.id} button onClick={() => onTaskClick(task)}>
                     <ListItemText

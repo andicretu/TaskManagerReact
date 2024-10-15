@@ -7,6 +7,7 @@ import React.TaskManager.Models.TaskModel;
 import React.TaskManager.Repositories.TaskRepository;
 import React.TaskManager.Models.UserModel;
 import React.TaskManager.Repositories.UserRepository;
+import React.TaskManager.Configurations.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -18,16 +19,19 @@ public class TaskController {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    public TaskController(TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskController(TaskRepository taskRepository, UserRepository userRepository, JwtUtil jwtUtil) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
     public ResponseEntity<List<TaskModel>> getTasksForUser(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        UserModel user = userRepository.findByEmail(token);
+        String userEmail = jwtUtil.extractEmail(token);
+        UserModel user = userRepository.findByEmail(userEmail);
     
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -40,7 +44,8 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<TaskModel> createTask(@RequestBody TaskModel newTask, HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        UserModel user = userRepository.findByEmail(token);
+        String userEmail = jwtUtil.extractEmail(token);
+        UserModel user = userRepository.findByEmail(userEmail);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -54,7 +59,8 @@ public class TaskController {
     @PutMapping("/{id}")
     public ResponseEntity<TaskModel> updateTask(@PathVariable Long id, @RequestBody TaskModel updatedTask, HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        UserModel user = userRepository.findByEmail(token);
+        String userEmail = jwtUtil.extractEmail(token);
+        UserModel user = userRepository.findByEmail(userEmail);
         
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -82,7 +88,8 @@ public class TaskController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id, HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        UserModel user = userRepository.findByEmail(token);
+        String userEmail = jwtUtil.extractEmail(token); // 
+        UserModel user = userRepository.findByEmail(userEmail);
         
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
