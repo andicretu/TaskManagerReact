@@ -10,17 +10,56 @@ const RegisterUser = () => {
     name: ''
   });
 
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+  });
+
   const navigate = useNavigate();
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*\d).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setUser({
       ...user,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+
+    if (name === 'email' && !validateEmail(value)) {
+      setErrors(prevErrors => ({ ...prevErrors, email: 'Invalid email format' }));
+    } else if (name === 'email') {
+      setErrors(prevErrors => ({ ...prevErrors, email: '' }));
+    }
+
+    if (name === 'password' && !validatePassword(value)) {
+      setErrors(prevErrors => ({ ...prevErrors, password: 'Password must be at least 8 characters long and contain at least one number' }));
+    } else if (name === 'password') {
+      setErrors(prevErrors => ({ ...prevErrors, password: '' }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validateEmail(user.email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    if (!validatePassword(user.password)) {
+      alert('Password must be at least 8 characters long and contain at least one number');
+      return;
+    }
+
     axios.post('http://localhost:8080/api/users/register', user)
       .then(response => {
         console.log(response.data);
@@ -31,10 +70,6 @@ const RegisterUser = () => {
         console.error(error);
         alert('Error registering user!');
       });
-  };
-
-  const handleLoginClick = () => {
-    navigate('/login');
   };
 
   return (
@@ -53,6 +88,8 @@ const RegisterUser = () => {
             value={user.email}
             onChange={handleChange}
             required
+            error={!!errors.email}
+            helperText={errors.email}
           />
           <TextField
             label="Password"
@@ -64,6 +101,8 @@ const RegisterUser = () => {
             value={user.password}
             onChange={handleChange}
             required
+            error={!!errors.password}
+            helperText={errors.password}
           />
           <TextField
             label="Name"
@@ -91,7 +130,7 @@ const RegisterUser = () => {
             fullWidth
             size="large"
             sx={{ mt: 2 }}
-            onClick={handleLoginClick}
+            onClick={() => navigate('/login')}
           >
             Login
           </Button>
@@ -102,5 +141,3 @@ const RegisterUser = () => {
 };
 
 export default RegisterUser;
-
-

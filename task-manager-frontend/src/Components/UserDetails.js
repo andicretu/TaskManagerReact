@@ -11,8 +11,8 @@ const UserDetails = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [openAddTaskDialog, setOpenAddTaskDialog] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', description: '' });
-  const [currentPage, setCurrentPage] = useState(0);  // New state for current page
-  const [totalPages, setTotalPages] = useState(0);  // Total number of pages
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0); 
   const navigate = useNavigate();
 
   const sortTasks = (tasks) => {
@@ -33,15 +33,15 @@ const UserDetails = () => {
         'Authorization': `Bearer ${token}`,
       },
       params: {
-        page,  // Current page number
-        size,  // Number of tasks per page
+        page,
+        size,
       }
     })
     .then(response => {
-      const tasks = response.data.content; // Get tasks for the current page
-      const sortedTasks = sortTasks(tasks); // Sort tasks
-      setTasks(sortedTasks);               // Set the sorted tasks for the current page
-      setTotalPages(response.data.totalPages); // Store total pages from response
+      const tasks = response.data.content;
+      const sortedTasks = sortTasks(tasks);
+      setTasks(sortedTasks);
+      setTotalPages(response.data.totalPages);
       console.log('Tasks fetched and sorted successfully:', sortedTasks);
     })
     .catch(error => {
@@ -62,7 +62,7 @@ const UserDetails = () => {
       })
         .then(response => {
           setUser(response.data);
-          handleTasksFetch(currentPage);  // Fetch tasks for the current page
+          handleTasksFetch(currentPage);
         })
         .catch(error => {
           console.error('Error fetching user details:', error);
