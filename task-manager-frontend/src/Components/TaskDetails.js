@@ -4,10 +4,10 @@ import axios from 'axios';
 
 const TaskDetails = ({ task, onTaskUpdated, onTaskDeleted, onClose }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTask, setEditedTask] = useState({ 
-    title: task.title, 
-    description: task.description, 
-    status: task.status || 'Not started' 
+  const [editedTask, setEditedTask] = useState({
+    title: task.title,
+    description: task.description,
+    status: task.status || 'NOT_STARTED'
   });
 
   const token = localStorage.getItem('authToken');
@@ -21,6 +21,12 @@ const TaskDetails = ({ task, onTaskUpdated, onTaskDeleted, onClose }) => {
     });
   }, [task]);
 
+  const statusMap = {
+    NOT_STARTED: 'Not Started',
+    IN_PROGRESS: 'In Progress',
+    DONE: 'Done'
+  };
+
   const handleSaveClick = () => {
     axios.put(`http://localhost:8080/api/tasks/${task.id}`, {
       title: editedTask.title,
@@ -31,14 +37,14 @@ const TaskDetails = ({ task, onTaskUpdated, onTaskDeleted, onClose }) => {
         'Authorization': `Bearer ${token}`
       }
     })
-    .then(response => {
-      onTaskUpdated(response.data);
-      setIsEditing(false);
-    })
-    .catch(error => {
-      console.error('Error saving task:', error);
-      alert('Failed to save task.');
-    });
+      .then(response => {
+        onTaskUpdated(response.data);
+        setIsEditing(false);
+      })
+      .catch(error => {
+        console.error('Error saving task:', error);
+        alert('Failed to save task.');
+      });
   };
 
   const handleDeleteClick = () => {
@@ -47,14 +53,14 @@ const TaskDetails = ({ task, onTaskUpdated, onTaskDeleted, onClose }) => {
         'Authorization': `Bearer ${token}`
       }
     })
-    .then(() => {
-      onTaskDeleted(task.id);
-      onClose();
-    })
-    .catch(error => {
-      console.error('Error deleting task:', error);
-      alert('Failed to delete task.');
-    });
+      .then(() => {
+        onTaskDeleted(task.id);
+        onClose();
+      })
+      .catch(error => {
+        console.error('Error deleting task:', error);
+        alert('Failed to delete task.');
+      });
   };
 
   return (
@@ -86,13 +92,13 @@ const TaskDetails = ({ task, onTaskUpdated, onTaskDeleted, onClose }) => {
               value={editedTask.status}
               onChange={(e) => setEditedTask({ ...editedTask, status: e.target.value })}
             >
-              <MenuItem value="Not Started">Not Started</MenuItem>
-              <MenuItem value="In Progress">In Progress</MenuItem>
-              <MenuItem value="Done">Done</MenuItem>
+              <MenuItem value="NOT_STARTED">Not Started</MenuItem>
+              <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
+              <MenuItem value="DONE">Done</MenuItem>
             </Select>
           </FormControl>
 
-          {/* Align Save and Close buttons horizontally using flexbox */}
+          {/* Align Save and Close buttons */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
             <Button variant="contained" onClick={handleSaveClick}>
               Save
@@ -107,9 +113,11 @@ const TaskDetails = ({ task, onTaskUpdated, onTaskDeleted, onClose }) => {
           <Typography variant="h5" gutterBottom>Task Details</Typography>
           <Typography variant="body1"><strong>Title:</strong> {task.title}</Typography>
           <Typography variant="body1"><strong>Description:</strong> {task.description}</Typography>
-          <Typography variant="body1"><strong>Status:</strong> {task.status || 'Not Started'}</Typography>
+          <Typography variant="body1">
+            <strong>Status:</strong> {statusMap[task.status] || 'Not Started'}
+          </Typography>
 
-          {/* Align Edit, Close, Delete buttons horizontally */}
+          {/* Align Edit, Close, Delete buttons */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
             <Button variant="contained" onClick={() => setIsEditing(true)} sx={{ mr: 2 }}>
               Edit
@@ -128,5 +136,7 @@ const TaskDetails = ({ task, onTaskUpdated, onTaskDeleted, onClose }) => {
 };
 
 export default TaskDetails;
+
+
 
 

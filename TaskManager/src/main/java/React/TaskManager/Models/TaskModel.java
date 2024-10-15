@@ -9,18 +9,27 @@ public class TaskModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
+
     @Column(name = "TITLE", nullable = false)
     private String title;
+
     @Column(name = "DESCRIPTION", nullable = false)
     private String description;
+
+    public enum TaskStatus {
+        NOT_STARTED, IN_PROGRESS, DONE
+    }
+    @Enumerated(EnumType.STRING)
     @Column(name = "STATUS", nullable = false)
-    private String status = "Not Started";
+    private TaskStatus status = TaskStatus.NOT_STARTED; 
+    
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private UserModel userModel;
     public TaskModel() {
     }
-    public TaskModel(Long id, String title, String description, String status, UserModel userModel) {
+
+    public TaskModel(Long id, String title, String description, TaskStatus status, UserModel userModel) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -43,10 +52,10 @@ public class TaskModel {
     public void setDescription(String description) {
         this.description = description;
     }
-    public String getStatus() {
+    public TaskStatus getStatus() {
         return status;
     }
-    public void setStatus(String status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
     public UserModel getUserModel() {

@@ -22,9 +22,9 @@ const Login = () => {
     e.preventDefault();
     axios.post('http://localhost:8080/api/users/login', credentials)
     .then(response => {
-      const jwtToken = response.data.token;  // Ensure this is the full JWT token
+      const jwtToken = response.data.token;
       console.log('Login successful:', jwtToken);
-      localStorage.setItem('authToken', jwtToken);  // Store the full JWT token
+      localStorage.setItem('authToken', jwtToken);
       localStorage.setItem('userEmail', credentials.email);
       navigate('/user-details');
     })
@@ -32,6 +32,10 @@ const Login = () => {
       console.error('Login error:', error);
       alert('Login failed!');
     });
+  };
+
+  const handleRegisterClick = () => {
+    navigate('/register');
   };
 
   return (
@@ -72,6 +76,16 @@ const Login = () => {
           >
             Login
           </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            size="large"
+            sx={{ mt: 2 }}
+            onClick={handleRegisterClick}
+          >
+            Register
+          </Button>
         </form>
       </Box>
     </Container>
@@ -79,3 +93,4 @@ const Login = () => {
 };
 
 export default Login;
+

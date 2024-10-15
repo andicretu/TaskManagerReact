@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Container, Typography, Box, Button, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
+import { Container, Typography, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import TaskDetails from './TaskDetails';
+import TaskList from './TaskList';
 
 const UserDetails = () => {
   const [user, setUser] = useState(null);
@@ -12,19 +13,16 @@ const UserDetails = () => {
   const [newTask, setNewTask] = useState({ title: '', description: '' });
   const navigate = useNavigate();
 
-  // Function to sort tasks by status: Not Started -> In Progress -> Done
   const sortTasks = (tasks) => {
     const statusOrder = { 'Not Started': 1, 'In Progress': 2, 'Done': 3 };
     return tasks.sort((a, b) => (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0));
   };
 
-  // Function to fetch tasks for the authenticated user
   const handleTasksFetch = useCallback(() => {
     const token = localStorage.getItem('authToken');
-    console.log('authToken', "handletask");
     if (!token) {
       alert('Authentication token is missing. Please log in.');
-      navigate('/login');  // Redirect to login
+      navigate('/login');
       return;
     }
 
@@ -34,9 +32,8 @@ const UserDetails = () => {
       }
     })
     .then(response => {
-      const sortedTasks = sortTasks(response.data); // Sort tasks after fetching
+      const sortedTasks = sortTasks(response.data);
       setTasks(sortedTasks);
-      console.log('Tasks fetched and sorted successfully:', sortedTasks);
     })
     .catch(error => {
       console.error('Error fetching tasks:', error.response ? error.response.data : error.message);
@@ -56,9 +53,7 @@ const UserDetails = () => {
       })
         .then(response => {
           setUser(response.data);
-          console.log('User details fetched successfully:', response.data);
-          handleTasksFetch(); // Fetch tasks once user details are loaded
-          console.log(localStorage.getItem('userEmail'));
+          handleTasksFetch();
         })
         .catch(error => {
           console.error('Error fetching user details:', error);
@@ -71,20 +66,19 @@ const UserDetails = () => {
   }, [navigate, handleTasksFetch]);
 
   const handleTaskClick = (task) => {
-    console.log(task.status);
-    setSelectedTask(task); // Set the clicked task to display its details
+    setSelectedTask(task);
   };
 
   const handleTaskUpdated = (updatedTask) => {
     const updatedTasks = tasks.map(task => task.id === updatedTask.id ? updatedTask : task);
-    setTasks(sortTasks(updatedTasks)); // Sort tasks after update
-    setSelectedTask(updatedTask); // Update the selected task with new data
+    setTasks(sortTasks(updatedTasks));
+    setSelectedTask(updatedTask);
   };
 
   const handleTaskDeleted = (taskId) => {
     const remainingTasks = tasks.filter(task => task.id !== taskId);
-    setTasks(sortTasks(remainingTasks)); // Sort tasks after deletion
-    setSelectedTask(null); // Clear selected task
+    setTasks(sortTasks(remainingTasks));
+    setSelectedTask(null);
   };
 
   const handleLogout = () => {
@@ -112,7 +106,7 @@ const UserDetails = () => {
     })
     .then(response => {
       const updatedTasks = [...tasks, response.data];
-      setTasks(sortTasks(updatedTasks)); // Sort tasks after addition
+      setTasks(sortTasks(updatedTasks));
       handleCloseAddTaskDialog();
     })
     .catch(error => {
@@ -135,7 +129,6 @@ const UserDetails = () => {
 
   return (
     <Container maxWidth="lg">
-      {/* User Details Section as a row above the two-column layout */}
       <Box sx={{ p: 3, boxShadow: 3, borderRadius: 2, mb: 3 }}>
         <Typography variant="h4" align="center" gutterBottom>
           Your Details
@@ -150,7 +143,7 @@ const UserDetails = () => {
           variant="contained"
           color="secondary"
           size="large"
-          sx={{ width: '20%', mt: 2, align:'left' }}
+          sx={{ width: '20%', mt: 2 }}
           onClick={handleLogout}
         >
           Logout
@@ -162,48 +155,7 @@ const UserDetails = () => {
         
         {/* Task List Section */}
         <Box sx={{ flex: 1, p: 3, boxShadow: 3, borderRadius: 2 }}>
-          <Typography variant="h5" align="center" gutterBottom>
-            Tasks
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mb: 2 }}
-            onClick={handleOpenAddTaskDialog}
-          >
-            Add Task
-          </Button>
-          {tasks.length > 0 ? (
-            <List>
-              {tasks.map((task) => (
-                <ListItem key={task.id} button onClick={() => handleTaskClick(task)}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                    <ListItemText
-                      primary={task.title}
-                      secondary={task.description}
-                    />
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        alignSelf: 'center', 
-                        color:       
-                        task.status === 'Not Started' ? 'red' : 
-                        task.status === 'In Progress' ? 'orange' : 
-                        'green'
-                      }}
-                    >
-                      {task.status || 'Not Started'}
-                    </Typography>
-                  </Box>
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Typography variant="body1" align="center">
-              No tasks available.
-            </Typography>
-          )}
+          <TaskList tasks={tasks} onTaskClick={handleTaskClick} onAddTask={handleOpenAddTaskDialog} />
         </Box>
 
         {/* Task Details Section */}
@@ -259,4 +211,5 @@ const UserDetails = () => {
 };
 
 export default UserDetails;
+
 

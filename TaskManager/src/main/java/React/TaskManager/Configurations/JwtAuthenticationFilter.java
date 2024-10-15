@@ -32,13 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = null;
         String email = null;
 
-        // Extract JWT from the Authorization header (format: "Bearer token")
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             token = authorizationHeader.substring(7);
             email = jwtUtil.extractEmail(token);
         }
 
-        // If the token is valid and not already authenticated, authenticate the user
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = this.userDetailsService.loadUserByUsername(email);
 

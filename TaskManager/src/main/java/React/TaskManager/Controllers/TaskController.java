@@ -51,7 +51,7 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        newTask.setUserModel(user); // Set the user for the task
+        newTask.setUserModel(user);
         TaskModel createdTask = taskRepository.save(newTask);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }

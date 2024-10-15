@@ -1,9 +1,7 @@
 package React.TaskManager.Services;
 
-import React.TaskManager.Repositories.UserRepository; // Assuming you have a UserRepository interface
-
+import React.TaskManager.Repositories.UserRepository;
 import java.util.ArrayList;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const RegisterUser = () => {
   const [user, setUser] = useState({
@@ -10,7 +10,7 @@ const RegisterUser = () => {
     name: ''
   });
 
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setUser({
@@ -25,12 +25,16 @@ const RegisterUser = () => {
       .then(response => {
         console.log(response.data);
         alert('User registered successfully!');
-        navigate('/login'); // Redirect to the login page
+        navigate('/login');
       })
       .catch(error => {
         console.error(error);
         alert('Error registering user!');
       });
+  };
+
+  const handleLoginClick = () => {
+    navigate('/login');
   };
 
   return (
@@ -81,6 +85,16 @@ const RegisterUser = () => {
           >
             Register
           </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            size="large"
+            sx={{ mt: 2 }}
+            onClick={handleLoginClick}
+          >
+            Login
+          </Button>
         </form>
       </Box>
     </Container>
@@ -88,4 +102,5 @@ const RegisterUser = () => {
 };
 
 export default RegisterUser;
+
 
